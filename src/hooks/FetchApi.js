@@ -4,7 +4,11 @@ import axios from "axios";
 const FetchApi = () => {
   const [count, setCount] = useState(null);
 
-  const options = { method: "GET", url: "http://ip-api.com/json/" };
+  const options = {
+    method: "GET",
+    url: "http://ip-api.com/json/",
+    headers: { "Access-Control-Allow-Origin": "*" },
+  };
 
   useEffect(() => {
     const controller = new AbortController();
