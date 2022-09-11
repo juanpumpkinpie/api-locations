@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import FetchApi from "./hooks/FetchApi";
+import axios from "axios";
 
 function App() {
   const [isCancelled, setIsCancelled] = useState(false);
+  const [error, setError] = useState(null);
+  const [location, setLocation] = useState("");
+  const [list, setList] = useState([]);
   const { count } = FetchApi();
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (isCancelled) {
@@ -15,35 +20,101 @@ function App() {
     };
   }, [count]);
 
+  useEffect(() => {
+    if (list.length !== 0) {
+      console.log("list", list);
+      localStorage.setItem("list-location", JSON.stringify(list));
+    }
+
+    return () => {
+      setIsCancelled(true);
+    };
+  }, [list]);
+
+  const options = {
+    method: "GET",
+    url: `https://api.ipgeolocation.io/ipgeo?apiKey=c5d69a3525d64bf7ac9c0eb236612c6c&ip=${location}`,
+  };
+
+  const handleLocation = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.request(options);
+      setLocation(response.data);
+      console.log("Location-input data:", response.data);
+      const item = inputRef.current.value;
+      setList([item, ...list]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <div className=" text-md font-bold underline p-7 bg-gray-200 ">
-      <h2>Dashboard</h2>
-      <div className=" grid grid-cols-6 grid-rows-6 gap-3 bg-purple-600/10">
-        <div className=" border-solid	border-2 border-indigo-600 row-span-6 col-span-2">
-          List of all searches {count !== null && <p>{count.ip}</p>}
+    <div className=" text-md font-bold  p-7 bg-gray-200 ">
+      <div className=" grid grid-cols-3 grid-rows-3 gap-2 ">
+        <div className=" border-solid	border-2 border-purple-600/10 row-span-3 ">
+          List of all searches{" "}
+          {count !== null && (
+            <>
+              <ul>
+                {list.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
-        <div className=" border-solid	border-2 border-indigo-600  col-span-2">
+        <div className=" border-solid	border-2 border-indigo-600">
           Map with user location
         </div>
-        <div className=" border-solid	border-2 border-indigo-600  col-span-2">
+        <div className=" border-solid	border-2 border-indigo-600">
           information about user location:
           {count !== null && (
             <ul>
               <li>IP: {count.ip}</li>
+              <li>City: {count.city}</li>
               <li>Country: {count.continent_name}</li>
-              <li>City: {count.zipcode}</li>
+              <li>Zipcode: {count.zipcode}</li>
             </ul>
           )}
         </div>
-        <div className=" border-solid	border-2 border-indigo-600  col-span-3">
-          search box
+        <div className="col-span-2">
+          <form method="POST" onSubmit={handleLocation}>
+            <input
+              type="text"
+              ref={inputRef}
+              placeholder="Search IP: 0.0.0.0"
+              onChange={({ target }) => {
+                setLocation(target.value);
+              }}
+              className=" border-none p-2 w-[70%]"
+            />
+            <button
+              type="submit"
+              className=" bg-green-500 text-yellow-50 p-2 rounded-sm ml-5 w-[20%] mt-5"
+            >
+              SEARCH
+            </button>
+          </form>
+          <p className=" text-red-400">{error}</p>
         </div>
-        <div className=" border-solid	border-2 border-indigo-600">search</div>
-        <div className=" border-solid	border-2 border-indigo-600  col-span-2">
+
+        <div className=" border-solid	border-2 border-indigo-600  ">
           Map with last search location
         </div>
-        <div className=" border-solid	border-2 border-indigo-600  col-span-2">
-          Information about last search
+        <div className=" border-solid	border-2 border-indigo-600  ">
+          Information about last search:
+          {location !== "" ? (
+            <ul>
+              <li>IP: {location.ip}</li>
+              <li>City: {location.city}</li>
+              <li>Country: {location.continent_name}</li>
+              <li>Zipcode: {location.zipcode}</li>
+            </ul>
+          ) : (
+            "Not previews research found"
+          )}
         </div>
       </div>
     </div>
