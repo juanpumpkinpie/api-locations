@@ -6,8 +6,7 @@ const FetchApi = () => {
 
   const options = {
     method: "GET",
-    url: "http://ip-api.com/json/",
-    headers: { "Access-Control-Allow-Origin": "*" },
+    url: "https://api.ipgeolocation.io/ipgeo?apiKey=c5d69a3525d64bf7ac9c0eb236612c6c",
   };
 
   useEffect(() => {

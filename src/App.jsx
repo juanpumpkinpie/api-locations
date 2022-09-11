@@ -20,7 +20,7 @@ function App() {
       <h2>Dashboard</h2>
       <div className=" grid grid-cols-6 grid-rows-6 gap-3 bg-purple-600/10">
         <div className=" border-solid	border-2 border-indigo-600 row-span-6 col-span-2">
-          List of all searches {count !== null && <p>{count.query}</p>}
+          List of all searches {count !== null && <p>{count.ip}</p>}
         </div>
         <div className=" border-solid	border-2 border-indigo-600  col-span-2">
           Map with user location
@@ -29,13 +29,9 @@ function App() {
           information about user location:
           {count !== null && (
             <ul>
-              <li>IP: {count.query}</li>
-              <li>Country: {count.country}</li>
-              <li>City: {count.city}</li>
-              <li>Region: {count.regionName}</li>
-              <li>
-                lon: {count.lon}- lat: {count.lat}
-              </li>
+              <li>IP: {count.ip}</li>
+              <li>Country: {count.continent_name}</li>
+              <li>City: {count.zipcode}</li>
             </ul>
           )}
         </div>
