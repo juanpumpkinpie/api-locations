@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import tt from "@tomtom-international/web-sdk-maps";
 import FetchApi from "./hooks/FetchApi";
 import axios from "axios";
 
@@ -7,8 +8,25 @@ function App() {
   const [error, setError] = useState(null);
   const [location, setLocation] = useState("");
   const [list, setList] = useState([]);
+  const [mapi, setMapi] = useState({});
   const { count } = FetchApi();
   const inputRef = useRef(null);
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    if (count !== null) {
+      let mapa = tt.map({
+        key: "8TDQwk6kFD0onsvogaVsI3GoVGeRC4lf",
+        container: mapRef.current,
+        center: [count.longitude, count.latitude],
+        zoom: 10,
+      });
+
+      setMapi(mapa);
+    }
+
+    // const ll = new tt.LngLat(-73.9749, 40.7736);
+  }, [count]);
 
   useEffect(() => {
     if (isCancelled) {
@@ -65,8 +83,8 @@ function App() {
             </>
           )}
         </div>
-        <div className=" border-solid	border-2 border-indigo-600">
-          Map with user location
+        <div className=" border-solid	border-2 border-indigo-600 h-60">
+          <div ref={mapRef} className=" max-h-60"></div>
         </div>
         <div className=" border-solid	border-2 border-indigo-600">
           information about user location:
