@@ -22,8 +22,6 @@ function App() {
   const inputRef = useRef(null);
   const mapRef = useRef(null);
 
-  console.log("try: 5.44.31.255");
-
   useEffect(() => {
     validIp.test(api) ? setValid(true) : setValid(false);
 
@@ -124,7 +122,7 @@ function App() {
               <input
                 type="text"
                 ref={inputRef}
-                placeholder="Search location by IPv4: 0.0.0.0"
+                placeholder="Search location by IPv4: 5.44.31.255"
                 className=" border-none p-2 w-[70%] rounded-md"
                 onChange={({ target }) => setApi(target.value)}
               />
