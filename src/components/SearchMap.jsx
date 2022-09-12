@@ -14,6 +14,10 @@ const SearchMap = ({ location }) => {
     });
 
     setMapi(mapa);
+
+    return () => {
+      mapa.remove();
+    };
   }, [location]);
 
   return (

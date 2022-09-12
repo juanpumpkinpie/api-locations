@@ -35,15 +35,7 @@ function App() {
   }, [count]);
 
   useEffect(() => {
-    if (isCancelled) {
-      console.log("count", count);
-      console.log("rendering again");
-    }
-  }, [count]);
-
-  useEffect(() => {
     if (list.length !== 0) {
-      console.log("list", list);
       localStorage.setItem("list-location", JSON.stringify(list));
     }
 
@@ -63,12 +55,12 @@ function App() {
     try {
       const response = await axios.request(options);
       setLocation(response.data);
-      console.log("Location-input data:", response.data);
+
       const item = inputRef.current.value;
       setList([item, ...list]);
     } catch (error) {
       setError(error);
-      console.log(error);
+
       setLocation("");
       setIsCancelled(false);
     }

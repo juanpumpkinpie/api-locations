@@ -20,7 +20,6 @@ const FetchApi = () => {
           signal: controller.signal,
         });
         setCount(response.data);
-        console.log("from apiCall", response.data);
         return response.data;
       } catch (error) {
         console.log(error);
