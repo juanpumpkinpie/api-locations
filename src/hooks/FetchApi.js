@@ -6,7 +6,9 @@ const FetchApi = () => {
 
   const options = {
     method: "GET",
-    url: "https://api.ipgeolocation.io/ipgeo?apiKey=c5d69a3525d64bf7ac9c0eb236612c6c",
+    url: `https://api.ipgeolocation.io/ipgeo?apiKey=${
+      import.meta.env.VITE_KEY_API_LOCATION
+    }`,
   };
 
   useEffect(() => {
