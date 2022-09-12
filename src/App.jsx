@@ -1,21 +1,37 @@
-import { useEffect, useState, useRef, createContext } from "react";
+import { useEffect, useState, useRef } from "react";
 import tt from "@tomtom-international/web-sdk-maps";
 import FetchApi from "./hooks/FetchApi";
 import axios from "axios";
 import SearchMap from "./components/SearchMap";
+import ErrorBoundary from "./ErrorBoundary";
+import { validIp } from "./helpers/RegExp";
 
-const LocationContext = createContext();
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CachedIcon from "@mui/icons-material/Cached";
 
 function App() {
   const [isCancelled, setIsCancelled] = useState(false);
   const [error, setError] = useState(null);
   const [location, setLocation] = useState("");
+  const [valid, setValid] = useState(false);
   const [api, setApi] = useState("");
   const [list, setList] = useState([]);
   const [mapi, setMapi] = useState({});
   const { count } = FetchApi();
   const inputRef = useRef(null);
   const mapRef = useRef(null);
+
+  console.log("try: 5.44.31.255");
+
+  useEffect(() => {
+    validIp.test(api) ? setValid(true) : setValid(false);
+
+    return () => {
+      setValid(false);
+      setError(null);
+    };
+  }, [api]);
 
   useEffect(() => {
     if (count !== null) {
@@ -51,42 +67,49 @@ function App() {
 
   const handleLocation = async (event) => {
     event.preventDefault();
+    if (valid) {
+      try {
+        const response = await axios.request(options);
+        setLocation(response.data);
 
-    try {
-      const response = await axios.request(options);
-      setLocation(response.data);
+        const item = inputRef.current.value;
+        setList([item, ...list]);
+      } catch (error) {
+        setError(error);
+        setLocation("");
+        setIsCancelled(false);
+      }
+    }
 
-      const item = inputRef.current.value;
-      setList([item, ...list]);
-    } catch (error) {
-      setError(error);
-
-      setLocation("");
-      setIsCancelled(false);
+    if (!valid) {
+      setError("Invalid IP address");
     }
   };
 
   return (
-    <LocationContext.Provider value={{ location, setLocation }}>
+    <ErrorBoundary>
       <div className=" text-md font-bold  p-7 bg-gray-200 ">
         <div className=" grid grid-cols-3 grid-rows-3 gap-2 ">
-          <div className=" border-solid	border-2 border-purple-600/10 row-span-3 ">
+          <div className=" bg-white rounded-md p-3 row-span-3 ">
             List of all searches{" "}
             {count !== null && (
               <>
                 <ul>
                   {list.map((item) => (
-                    <li key={item}>{item}</li>
+                    <li key={item} className="p-2">
+                      <LocationOnIcon color="secondary" /> {item}
+                    </li>
                   ))}
                 </ul>
               </>
             )}
           </div>
-          <div className=" border-solid	border-2 border-indigo-600 h-60">
+          <div>
             <div ref={mapRef} className=" max-h-60"></div>
           </div>
-          <div className=" border-solid	border-2 border-indigo-600">
-            information about user location:
+          <div className=" bg-indigo-600/10 rounded-md p-3">
+            <h2>Current user location:</h2>
+
             {count !== null && (
               <ul>
                 <li>IP: {count.ip}</li>
@@ -101,10 +124,11 @@ function App() {
               <input
                 type="text"
                 ref={inputRef}
-                placeholder="Search IP: 0.0.0.0"
-                className=" border-none p-2 w-[70%]"
+                placeholder="Search location by IPv4: 0.0.0.0"
+                className=" border-none p-2 w-[70%] rounded-md"
                 onChange={({ target }) => setApi(target.value)}
               />
+
               <button
                 type="submit"
                 className=" bg-green-500 text-yellow-50 p-2 rounded-sm ml-5 w-[20%] mt-5"
@@ -112,32 +136,53 @@ function App() {
                 SEARCH
               </button>
             </form>
-            <p className=" text-red-400">{error}</p>
+            {error !== null && (
+              <p className=" text-red-400 mt-4">
+                <ErrorOutlineIcon /> {error}
+              </p>
+            )}
           </div>
 
-          <div className=" border-solid	border-2 border-indigo-600  ">
+          <div>
             {location !== "" ? (
               <SearchMap location={location} />
             ) : (
-              "Waiting to search"
+              <span className=" text-gray-400">
+                <CachedIcon />
+              </span>
             )}
           </div>
-          <div className=" border-solid	border-2 border-indigo-600  ">
-            Information about last search:
+          <div className="rounded-md p-3">
+            <h2> Information about last search:</h2>
+
             {location !== "" ? (
               <ul>
-                <li>IP: {location.ip}</li>
-                <li>City: {location.city}</li>
-                <li>Country: {location.continent_name}</li>
-                <li>Zipcode: {location.zipcode}</li>
+                <li>
+                  IP: <span className=" text-green-500">{location.ip}</span>
+                </li>
+                <li>
+                  City:<span className=" text-green-500"> {location.city}</span>
+                </li>
+                <li>
+                  Country:
+                  <span className=" text-green-500">
+                    {location.continent_name}
+                  </span>
+                </li>
+                <li>
+                  Zipcode:
+                  <span className=" text-green-500">{location.zipcode}</span>
+                </li>
               </ul>
             ) : (
-              "Not previews research found"
+              <span className=" text-gray-400">
+                Not previews research found
+              </span>
             )}
           </div>
         </div>
       </div>
-    </LocationContext.Provider>
+    </ErrorBoundary>
   );
 }
 
