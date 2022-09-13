@@ -1,5 +1,6 @@
 #the Api's
-<img width="1075" alt="Screenshot 2022-09-13 at 09 25 58" src="https://user-images.githubusercontent.com/14529200/189837600-71028961-53a6-4a63-b402-1e241f2d75f0.png">
+<img width="1075" alt="Screenshot 2022-09-13 at 09 25 58" src="https://user-images.githubusercontent.com/14529200/189837876-65f0c0b5-052c-4245-bae6-d3f64de264c1.png">
+
 
 
 ## How it works?
